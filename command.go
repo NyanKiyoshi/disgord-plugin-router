@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type MatcherFunc func(input string) bool
+type matcherFunc func(input string) bool
 
 // Command defines the structure of a plugin sub-command.
 type Command struct {
@@ -15,14 +15,14 @@ type Command struct {
 	// MatchFunc is called whenever a new message
 	// (starting with the correct prefix) is received by the plugin
 	// and return true or false if it should be handled by this command or not.
-	MatchFunc MatcherFunc
+	MatchFunc matcherFunc
 
 	// HandlerFunc contains the function to invoke
 	// whenever the command is requested.
-	HandlerFunc CallbackFunc
+	HandlerFunc callbackFunc
 
 	// Wrappers contains the functions to invoke before the command.
-	Wrappers []CallbackFunc
+	Wrappers []callbackFunc
 
 	// ShortHelp contains the short straightforward command help.
 	ShortHelp string
@@ -32,7 +32,7 @@ type Command struct {
 }
 
 // Match sets the matching function from a given function.
-func (cmd *Command) Match(matcherFunc MatcherFunc) *Command {
+func (cmd *Command) Match(matcherFunc matcherFunc) *Command {
 	cmd.MatchFunc = matcherFunc
 	return cmd
 }
@@ -50,14 +50,14 @@ func (cmd *Command) MatchRE(regex string) *Command {
 
 // Handler defines the function to invoke whenever the command
 // is being invoked.
-func (cmd *Command) Handler(callbackFunc CallbackFunc) *Command {
+func (cmd *Command) Handler(callbackFunc callbackFunc) *Command {
 	cmd.HandlerFunc = callbackFunc
 	return cmd
 }
 
 // Use appends given callbacks to a command to call
 // whenever a command is being invoked.
-func (cmd *Command) Use(callbackFuncs ...CallbackFunc) *Command {
+func (cmd *Command) Use(callbackFuncs ...callbackFunc) *Command {
 	cmd.Wrappers = append(cmd.Wrappers, callbackFuncs...)
 	return cmd
 }

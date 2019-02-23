@@ -1,3 +1,3 @@
 package discplugins
 
-type CallbackFunc func(ctx *Context) error
+type callbackFunc func(ctx *Context) error

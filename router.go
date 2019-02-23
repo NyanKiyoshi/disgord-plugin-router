@@ -1,15 +1,19 @@
 package discplugins
 
 import (
-	"github.com/andersfylling/disgord"
 	"reflect"
 	"regexp"
 )
 
-// ShouldEnablePluginFunc defines the type of a module matcher.
+// routerClient defines the expected client type.
+type routerClient interface {
+	On(event string, inputs ...interface{}) error
+}
+
+// shouldEnablePluginFunc defines the type of a module matcher.
 // Returns false to disable a given plugin. Or true to allow it
 // and proceed to the next matcher function.
-type ShouldEnablePluginFunc func(plugin *Plugin) bool
+type shouldEnablePluginFunc func(plugin *Plugin) bool
 
 // Router defines the structure of a bot plugins routing.
 type Router struct {
@@ -18,7 +22,7 @@ type Router struct {
 
 	// ShouldEnablePluginFuncs contains a list of matcher to test
 	// against package paths. If it returns false, the plugin must disabled.
-	ShouldEnablePluginFuncs []ShouldEnablePluginFunc
+	ShouldEnablePluginFuncs []shouldEnablePluginFunc
 }
 
 // New creates a new plugin router.
@@ -42,7 +46,7 @@ func (router *Router) Plugin(pluginType interface{}, names ...string) *Plugin {
 		RootCommand: Command{
 			Names: names,
 		},
-		Prefix: DefaultPrefix,
+		Prefix:    DefaultPrefix,
 		Listeners: map[string][]interface{}{},
 	}
 
@@ -50,11 +54,10 @@ func (router *Router) Plugin(pluginType interface{}, names ...string) *Plugin {
 }
 
 // ShouldUse register matchers to test against plugins to keep enabled or to disable.
-func (router *Router) ShouldUse(pluginFuncs... ShouldEnablePluginFunc) *Router {
+func (router *Router) ShouldUse(pluginFuncs ...shouldEnablePluginFunc) *Router {
 	router.ShouldEnablePluginFuncs = append(router.ShouldEnablePluginFuncs, pluginFuncs...)
 	return router
 }
-
 
 // ShouldNotUseRE registers a regex to be tested against plugins that should be disabled.
 func (router *Router) ShouldNotUseRE(regex string) *Router {
@@ -66,6 +69,6 @@ func (router *Router) ShouldNotUseRE(regex string) *Router {
 }
 
 // Load loads the router and plugins into the bot client.
-func (router *Router) Load(client *disgord.Client)  {
+func (router *Router) Load(client routerClient) {
 	// FIXME: Not implemented
 }

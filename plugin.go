@@ -23,7 +23,7 @@ type Plugin struct {
 
 // Use appends given callbacks to a plugin to call
 // whenever a command is being invoked.
-func (plugin *Plugin) Use(callbackFuncs ...CallbackFunc) *Plugin {
+func (plugin *Plugin) Use(callbackFuncs ...callbackFunc) *Plugin {
 	plugin.RootCommand.Use(callbackFuncs...)
 	return plugin
 }
@@ -36,13 +36,13 @@ func (plugin *Plugin) SetPrefix(prefix string) *Plugin {
 
 // Handler defines the function to invoke whenever the plugin command
 // is being invoked.
-func (plugin *Plugin) Handler(callbackFunc CallbackFunc) *Plugin {
+func (plugin *Plugin) Handler(callbackFunc callbackFunc) *Plugin {
 	plugin.RootCommand.Handler(callbackFunc)
 	return plugin
 }
 
 // On registers given handlers to be invoked whenever the event is fired.
-func (plugin *Plugin) On(eventName string, inputs... interface{}) *Plugin {
+func (plugin *Plugin) On(eventName string, inputs ...interface{}) *Plugin {
 	existingEvents := plugin.Listeners[eventName]
 
 	if existingEvents != nil {
