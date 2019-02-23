@@ -1,26 +1,28 @@
-package discplugins_test
+package drouter_test
 
 import (
 	"fmt"
 	"github.com/NyanKiyoshi/disgord-plugin-router"
+	"github.com/NyanKiyoshi/disgord-plugin-router/mocks/mocked_disgord"
+	"github.com/andersfylling/disgord"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 type _myModuleInternalType struct{}
 
-func createTestRouter() *discplugins.Router {
-	return discplugins.New()
+func createTestRouter() *drouter.RouterDefinition {
+	return &drouter.RouterDefinition{}
 }
 
-func createTestPlugin() *discplugins.Plugin {
+func createTestPlugin() *drouter.Plugin {
 	return createTestRouter().Plugin(_myModuleInternalType{}, "my-module")
 }
 
 func ExampleNew_newPlugin() {
-	myRouter := discplugins.New()
-	myPlugin := myRouter.Plugin(_myModuleInternalType{}, "my-plugin")
-	fmt.Printf("ImportName: %s\nNames: %s", myPlugin.ImportName, myPlugin.RootCommand.Names)
+	myPlugin := drouter.Router.Plugin(_myModuleInternalType{}, "my-plugin")
+	fmt.Printf("ImportName: %s\nNames: %s", myPlugin.ImportName, myPlugin.RootCommand.Names.Keys())
 	// Output:
 	// ImportName: github.com/NyanKiyoshi/disgord-plugin-router_test
 	// Names: [my-plugin]
@@ -39,7 +41,7 @@ func TestRouter_ShouldUse(t *testing.T) {
 	assert.Len(t, router.ShouldEnablePluginFuncs, 0)
 
 	// Add dummy matcher
-	router.ShouldUse(func(plugin *discplugins.Plugin) bool {
+	router.ShouldUse(func(plugin *drouter.Plugin) bool {
 		return true
 	})
 
@@ -48,12 +50,11 @@ func TestRouter_ShouldUse(t *testing.T) {
 	assert.True(t, router.ShouldEnablePluginFuncs[0](nil))
 }
 
-
 func TestRouter_ShouldNotUseRE(t *testing.T) {
 	// Create dummy router and test plugins
 	router := createTestRouter()
-	enabledPlugin := &discplugins.Plugin{ImportName: "enabled!!"}
-	disabledPlugin := &discplugins.Plugin{ImportName: "peach"}
+	enabledPlugin := &drouter.Plugin{ImportName: "enabled!!"}
+	disabledPlugin := &drouter.Plugin{ImportName: "peach"}
 
 	// Ensure there are not matcher by default
 	assert.Len(t, router.ShouldEnablePluginFuncs, 0)
@@ -67,7 +68,16 @@ func TestRouter_ShouldNotUseRE(t *testing.T) {
 	assert.False(t, router.ShouldEnablePluginFuncs[0](disabledPlugin))
 }
 
-func TestRouter_Load(t *testing.T) {
+func TestRouter_Configure(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockedClient := mocked_disgord.NewMockrouterClient(mockCtrl)
+	mockedClient.
+		EXPECT().
+		On(disgord.EventMessageCreate, gomock.Any()).
+		Return(nil)
+
 	router := createTestRouter()
-	router.Load(nil)
+	router.Configure(mockedClient)
 }

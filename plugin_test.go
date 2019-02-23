@@ -1,4 +1,4 @@
-package discplugins_test
+package drouter_test
 
 import (
 	"github.com/NyanKiyoshi/disgord-plugin-router"
@@ -11,7 +11,7 @@ func TestPlugin_Use(t *testing.T) {
 	plugin := createTestPlugin()
 
 	// Create the dummy callback
-	callback := func(ctx *discplugins.Context) error {
+	callback := func(ctx *drouter.Context) error {
 		return successError
 	}
 
@@ -31,7 +31,7 @@ func TestPlugin_SetPrefix(t *testing.T) {
 	plugin := createTestPlugin()
 
 	// Ensure the default prefix is used by default
-	assert.Equal(t, discplugins.DefaultPrefix, plugin.Prefix)
+	assert.Equal(t, drouter.DefaultPrefix, plugin.Prefix)
 
 	// Set a new prefix
 	plugin.SetPrefix("??")
@@ -43,7 +43,7 @@ func TestPlugin_SetPrefix(t *testing.T) {
 func TestPlugin_Handler(t *testing.T) {
 	// Create a testing plugin and a dummy handler
 	plugin := createTestPlugin()
-	handler := func(ctx *discplugins.Context) error {
+	handler := func(ctx *drouter.Context) error {
 		return successError
 	}
 
@@ -107,10 +107,10 @@ func TestPlugin_Command(t *testing.T) {
 	cmd := plugin.Command("color", "colour")
 
 	// Check if the command was correctly registered
-	assert.EqualValues(t, []*discplugins.Command{cmd}, plugin.Commands)
+	assert.EqualValues(t, []*drouter.Command{cmd}, plugin.Commands)
 
 	// Check if the registered command is correct
-	assert.EqualValues(t, []string{"color", "colour"}, cmd.Names)
+	assert.ElementsMatch(t, []string{"color", "colour"}, cmd.Names.Keys())
 	assert.Nil(t, cmd.HandlerFunc)
 	assert.Empty(t, cmd.Wrappers)
 }

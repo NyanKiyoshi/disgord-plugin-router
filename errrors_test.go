@@ -1,4 +1,4 @@
-package discplugins_test
+package drouter_test
 
 import "errors"
 

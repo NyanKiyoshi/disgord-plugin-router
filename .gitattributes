@@ -1,2 +1,5 @@
 # force LF EOL
 * text=auto eol=lf
+
+# mockgen generated files
+mocked_*.go linguist-generated

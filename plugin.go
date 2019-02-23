@@ -1,4 +1,4 @@
-package discplugins
+package drouter
 
 var DefaultPrefix = "/"
 
@@ -17,8 +17,11 @@ type Plugin struct {
 	// of the plugin (see https://godoc.org/github.com/andersfylling/disgord/event).
 	Listeners map[string][]interface{}
 
-	// Wrappers contains the registered sub-commands of the plugin.
+	// Wrappers Contains the registered sub-commands of the plugin.
 	Commands []*Command
+
+	// IsReady is true is the module was loaded and installed into the client.
+	IsReady bool
 }
 
 // Use appends given callbacks to a plugin to call
@@ -57,7 +60,7 @@ func (plugin *Plugin) On(eventName string, inputs ...interface{}) *Plugin {
 // Command creates a new sub-command for the plugin.
 func (plugin *Plugin) Command(names ...string) *Command {
 	newCommand := &Command{
-		Names: names,
+		Names: NewStringSet(names...),
 	}
 	plugin.Commands = append(plugin.Commands, newCommand)
 	return newCommand
