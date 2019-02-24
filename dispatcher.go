@@ -1,7 +1,6 @@
 package drouter
 
 import (
-	"github.com/andersfylling/disgord"
 	"log"
 	"strings"
 )
@@ -66,7 +65,7 @@ func (router *RouterDefinition) Find(args ...string) (string, *Command) {
 	return "", nil
 }
 
-func (router *RouterDefinition) dispatchMessage(ctx *Context) {
+func DispatchMessage(ctx *Context, success chan bool) {
 	var err error
 
 	// Run wrappers
@@ -87,17 +86,24 @@ func (router *RouterDefinition) dispatchMessage(ctx *Context) {
 	// (as is, it's expected to be already user formatted errors)
 	if err != nil {
 		err = ctx.Say(err.Error())
+	} else {
+		// We are done here, there was no error
+		success <- true
+		return
 	}
 
 	// If we failed to communicate the error (as reply), there may
 	// be a permission issue or else. Thus, log the error.
 	if err != nil {
 		log.Printf(
-			"failed to communicate %s%s error: %s",
+			"failed to communicate prefix: %s / names: %s: %s",
 			ctx.MatchedPrefix, ctx.Command.Names, err)
 	}
+
+	// We are done here, but there was an error, report it failed
+	success <- false
 }
 
-func parseMessage(message *disgord.Message) []string {
-	return strings.Fields(message.Content)
+func ParseMessage(message string) []string {
+	return strings.Fields(message)
 }
