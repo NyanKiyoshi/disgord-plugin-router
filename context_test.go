@@ -10,14 +10,19 @@ import (
 )
 
 var channelID = disgord.NewSnowflake(123)
+var selfUserID = disgord.NewSnowflake(456)
 
 func createDummyMessage() *disgord.Message {
 	return &disgord.Message{
 		ChannelID: channelID,
+		Author: &disgord.User{
+			ID: selfUserID,
+		},
+		Content: "hello",
 	}
 }
 
-func createDummyContext(session *mocked_disgord.MockclientSession) *drouter.Context {
+func createDummyContext(session *mocked_disgord.MockrouterSession) *drouter.Context {
 	return &drouter.Context{
 		Message: createDummyMessage(),
 		Session: session,
@@ -30,7 +35,7 @@ func TestContext_Say(t *testing.T) {
 
 	const messageToSend = "Hello world"
 
-	mockedSession := mocked_disgord.NewMockclientSession(mockCtrl)
+	mockedSession := mocked_disgord.NewMockrouterSession(mockCtrl)
 	mockedSession.
 		EXPECT().
 		SendMsgString(channelID, messageToSend).
@@ -46,7 +51,7 @@ func TestContext_SayComplex(t *testing.T) {
 
 	var messageToSend = &disgord.Message{}
 
-	mockedSession := mocked_disgord.NewMockclientSession(mockCtrl)
+	mockedSession := mocked_disgord.NewMockrouterSession(mockCtrl)
 	mockedSession.
 		EXPECT().
 		SendMsg(channelID, messageToSend).

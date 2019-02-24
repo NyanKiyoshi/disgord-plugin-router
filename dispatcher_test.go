@@ -113,7 +113,7 @@ func TestDispatchMessage_HandlesFuncErrors(t *testing.T) {
 		// Create mocked session
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
-		mockedSession := mocked_disgord.NewMockclientSession(mockCtrl)
+		mockedSession := mocked_disgord.NewMockrouterSession(mockCtrl)
 
 		// Create the test context
 		ctx := createDummyContext(mockedSession)

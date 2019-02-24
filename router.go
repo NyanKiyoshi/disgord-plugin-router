@@ -2,7 +2,6 @@ package drouter
 
 import (
 	"github.com/andersfylling/disgord/event"
-	"log"
 	"reflect"
 	"regexp"
 )
@@ -98,8 +97,8 @@ func (router *RouterDefinition) Configure(client routerClient) {
 // installInternalEvents installs the router internal events
 // into a given client.
 func (router *RouterDefinition) installInternalEvents(client routerClient) {
-	if err := client.On(event.MessageCreate, router.onMessageReceived); err != nil {
-		log.Fatal("failed to register router's internal MessageCreate event: ", err)
+	if err := client.On(event.MessageCreate, router.OnMessageReceived); err != nil {
+		LogFatalf("failed to register router's internal MessageCreate event: %s", err)
 	}
 }
 
@@ -107,7 +106,7 @@ func (router *RouterDefinition) installInternalEvents(client routerClient) {
 func configurePlugin(plugin *Plugin, client routerClient) {
 	for eventName, handlers := range plugin.Listeners {
 		if err := client.On(eventName, handlers...); err != nil {
-			log.Fatalf(
+			LogFatalf(
 				"failed to register event %s for plugin %s: %s",
 				eventName, plugin.ImportName, err)
 		}

@@ -8,7 +8,7 @@ type Context struct {
 	Message *disgord.Message
 
 	// Session contains the received discord session
-	Session clientSession
+	Session routerSession
 
 	// Command is the matched command
 	Command *Command

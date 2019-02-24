@@ -10,31 +10,46 @@ import (
 	reflect "reflect"
 )
 
-// MockclientSession is a mock of clientSession interface
-type MockclientSession struct {
+// MockrouterSession is a mock of routerSession interface
+type MockrouterSession struct {
 	ctrl     *gomock.Controller
-	recorder *MockclientSessionMockRecorder
+	recorder *MockrouterSessionMockRecorder
 }
 
-// MockclientSessionMockRecorder is the mock recorder for MockclientSession
-type MockclientSessionMockRecorder struct {
-	mock *MockclientSession
+// MockrouterSessionMockRecorder is the mock recorder for MockrouterSession
+type MockrouterSessionMockRecorder struct {
+	mock *MockrouterSession
 }
 
-// NewMockclientSession creates a new mock instance
-func NewMockclientSession(ctrl *gomock.Controller) *MockclientSession {
-	mock := &MockclientSession{ctrl: ctrl}
-	mock.recorder = &MockclientSessionMockRecorder{mock}
+// NewMockrouterSession creates a new mock instance
+func NewMockrouterSession(ctrl *gomock.Controller) *MockrouterSession {
+	mock := &MockrouterSession{ctrl: ctrl}
+	mock.recorder = &MockrouterSessionMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockclientSession) EXPECT() *MockclientSessionMockRecorder {
+func (m *MockrouterSession) EXPECT() *MockrouterSessionMockRecorder {
 	return m.recorder
 }
 
+// Myself mocks base method
+func (m *MockrouterSession) Myself() (*disgord.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Myself")
+	ret0, _ := ret[0].(*disgord.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Myself indicates an expected call of Myself
+func (mr *MockrouterSessionMockRecorder) Myself() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Myself", reflect.TypeOf((*MockrouterSession)(nil).Myself))
+}
+
 // SendMsg mocks base method
-func (m *MockclientSession) SendMsg(channelID disgord.Snowflake, message *disgord.Message) (*disgord.Message, error) {
+func (m *MockrouterSession) SendMsg(channelID disgord.Snowflake, message *disgord.Message) (*disgord.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsg", channelID, message)
 	ret0, _ := ret[0].(*disgord.Message)
@@ -43,13 +58,13 @@ func (m *MockclientSession) SendMsg(channelID disgord.Snowflake, message *disgor
 }
 
 // SendMsg indicates an expected call of SendMsg
-func (mr *MockclientSessionMockRecorder) SendMsg(channelID, message interface{}) *gomock.Call {
+func (mr *MockrouterSessionMockRecorder) SendMsg(channelID, message interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockclientSession)(nil).SendMsg), channelID, message)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockrouterSession)(nil).SendMsg), channelID, message)
 }
 
 // SendMsgString mocks base method
-func (m *MockclientSession) SendMsgString(channelID disgord.Snowflake, content string) (*disgord.Message, error) {
+func (m *MockrouterSession) SendMsgString(channelID disgord.Snowflake, content string) (*disgord.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMsgString", channelID, content)
 	ret0, _ := ret[0].(*disgord.Message)
@@ -58,7 +73,7 @@ func (m *MockclientSession) SendMsgString(channelID disgord.Snowflake, content s
 }
 
 // SendMsgString indicates an expected call of SendMsgString
-func (mr *MockclientSessionMockRecorder) SendMsgString(channelID, content interface{}) *gomock.Call {
+func (mr *MockrouterSessionMockRecorder) SendMsgString(channelID, content interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsgString", reflect.TypeOf((*MockclientSession)(nil).SendMsgString), channelID, content)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsgString", reflect.TypeOf((*MockrouterSession)(nil).SendMsgString), channelID, content)
 }

@@ -6,7 +6,10 @@ import (
 
 type callbackFunc func(ctx *Context) error
 
-func (router *RouterDefinition) onMessageReceived(session disgord.Session, event *disgord.MessageCreate) chan bool {
+// OnMessageReceived is invoked whenever a new message is created,
+// it will dispatch instructions if the message is a command,
+// and if the message is not from the bot itself.
+func (router *RouterDefinition) OnMessageReceived(session routerSession, event *disgord.MessageCreate) chan bool {
 	myself, err := session.Myself()
 	if err != nil || event.Message.Author.ID == myself.ID {
 		return nil

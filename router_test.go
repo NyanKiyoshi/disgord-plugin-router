@@ -83,16 +83,105 @@ func TestRouterDefinition_ShouldNotUseRE(t *testing.T) {
 	assert.False(t, router.ShouldEnablePluginFuncs[0](disabledPlugin))
 }
 
-func TestRouterDefinition_Configure(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
+// Test .Configure(...) without registering any plugin to configure.
+func TestRouterDefinition_Configure_OnlyInstallInternalEvents(t *testing.T) {
+	// Backup log.Fatal before mocking it
+	oldLogFatal := drouter.LogFatalf
+	defer func() { drouter.LogFatalf = oldLogFatal }()
 
-	mockedClient := mocked_disgord.NewMockrouterClient(mockCtrl)
-	mockedClient.
-		EXPECT().
-		On(disgord.EventMessageCreate, gomock.Any()).
-		Return(nil)
+	runTest := func(subT *testing.T, customErr error) {
+		// Mock log.Fatal
+		var receivedLog string
+		drouter.LogFatalf = func(format string, v ...interface{}) {
+			receivedLog = fmt.Sprintf(format, v...)
+		}
 
-	router := createTestRouter()
-	router.Configure(mockedClient)
+		mockCtrl := gomock.NewController(t)
+		defer mockCtrl.Finish()
+
+		mockedClient := mocked_disgord.NewMockrouterClient(mockCtrl)
+		mockedClient.
+			EXPECT().
+			On(disgord.EventMessageCreate, gomock.Any()).
+			Return(customErr)
+
+		router := createTestRouter()
+		router.Configure(mockedClient)
+
+		// Check if log.Fatal was called if an error was set
+		if customErr != nil {
+			assert.Equal(
+				subT,
+				"failed to register router's internal MessageCreate event: success",
+				receivedLog,
+			)
+		}
+	}
+
+	t.Run("with proper configuration", func(t *testing.T) {
+		runTest(t, nil)
+	})
+
+	t.Run("with errored configuration", func(t *testing.T) {
+		runTest(t, successError)
+	})
+}
+
+func TestRouterDefinition_Configure_WithRegisteredPlugins(t *testing.T) {
+	// Backup log.Fatal before mocking it
+	oldLogFatal := drouter.LogFatalf
+	defer func() { drouter.LogFatalf = oldLogFatal }()
+
+	router := createTestRouter().ShouldUse(func(plugin *drouter.Plugin) bool {
+		return plugin.Prefix != "disabled"
+	})
+	plugin := router.Plugin(_myModuleInternalType{}, "ping").
+		On(disgord.EventMessageCreate, nil) // Register a dummy event
+	disabledPlugin := router.Plugin(_myModuleInternalType{}).SetPrefix("disabled")
+
+	// Ensure it is false by default
+	assert.False(t, plugin.IsReady)
+
+	runTest := func(subT *testing.T, customErr error) {
+		// Mock log.Fatal
+		var receivedLog string
+		drouter.LogFatalf = func(format string, v ...interface{}) {
+			receivedLog = fmt.Sprintf(format, v...)
+		}
+
+		mockCtrl := gomock.NewController(t)
+		defer mockCtrl.Finish()
+
+		mockedClient := mocked_disgord.NewMockrouterClient(mockCtrl)
+		mockedClient.
+			EXPECT().
+			On(disgord.EventMessageCreate, gomock.Any()).
+			Return(customErr).
+			Times(2) // should be called twice: internal event & dummy custom event
+
+		// Run configure
+		router.Configure(mockedClient)
+
+		// Ensure the plugin was enabled and the disabled one was ignore
+		assert.True(t, plugin.IsReady)
+		assert.False(t, disabledPlugin.IsReady)
+
+		// Check if log.Fatal was called if an error was set
+		if customErr != nil {
+			assert.Equal(
+				subT,
+				"failed to register event MESSAGE_CREATE "+
+					"for plugin github.com/NyanKiyoshi/disgord-plugin-router_test: success",
+				receivedLog,
+			)
+		}
+	}
+
+	t.Run("with proper event", func(t *testing.T) {
+		runTest(t, nil)
+	})
+
+	t.Run("with invalid event error", func(t *testing.T) {
+		runTest(t, successError)
+	})
 }
