@@ -11,14 +11,14 @@ type Context struct {
 	Session clientSession
 }
 
-// Reply replies to a message with a given string.
-func (ctx *Context) Reply(message string) error {
+// Say replies to a message with a given string.
+func (ctx *Context) Say(message string) error {
 	_, err := ctx.Session.SendMsgString(ctx.Message.ChannelID, message)
 	return err
 }
 
-// ReplyComplex replies to a message with a given message object.
-func (ctx *Context) ReplyComplex(message *disgord.Message) error {
+// SayComplex replies to a message with a given message object.
+func (ctx *Context) SayComplex(message *disgord.Message) error {
 	_, err := ctx.Session.SendMsg(ctx.Message.ChannelID, message)
 	return err
 }

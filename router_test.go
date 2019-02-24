@@ -33,7 +33,22 @@ func TestNew(t *testing.T) {
 	assert.Len(t, router.Plugins, 0)
 }
 
-func TestRouter_ShouldUse(t *testing.T) {
+func TestRouterDefinition_Plugin(t *testing.T) {
+	router := createTestRouter()
+
+	// Ensure there are no plugins by default
+	assert.Empty(t, router.Plugins)
+
+	// Register a new plugin
+	plugin := router.Plugin(_myModuleInternalType{})
+
+	// Ensure the plugin was registerd
+	assert.NotEmpty(t, router.Plugins)
+	assert.NotNil(t, router.Plugins[0])
+	assert.Equal(t, plugin, router.Plugins[0])
+}
+
+func TestRouterDefinition_ShouldUse(t *testing.T) {
 	// Create dummy router
 	router := createTestRouter()
 
@@ -50,7 +65,7 @@ func TestRouter_ShouldUse(t *testing.T) {
 	assert.True(t, router.ShouldEnablePluginFuncs[0](nil))
 }
 
-func TestRouter_ShouldNotUseRE(t *testing.T) {
+func TestRouterDefinition_ShouldNotUseRE(t *testing.T) {
 	// Create dummy router and test plugins
 	router := createTestRouter()
 	enabledPlugin := &drouter.Plugin{ImportName: "enabled!!"}
@@ -68,7 +83,7 @@ func TestRouter_ShouldNotUseRE(t *testing.T) {
 	assert.False(t, router.ShouldEnablePluginFuncs[0](disabledPlugin))
 }
 
-func TestRouter_Configure(t *testing.T) {
+func TestRouterDefinition_Configure(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 

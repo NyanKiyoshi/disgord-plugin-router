@@ -27,6 +27,8 @@ type Plugin struct {
 // Use appends given callbacks to a plugin to call
 // whenever a command is being invoked.
 func (plugin *Plugin) Use(callbackFuncs ...callbackFunc) *Plugin {
+	// FIXME: we should put them as global wrappers in Plugin
+	//        instead of the root command.
 	plugin.RootCommand.Use(callbackFuncs...)
 	return plugin
 }
@@ -72,4 +74,10 @@ func (plugin *Plugin) Command(names ...string) *Command {
 func (plugin *Plugin) Help(helpText string) *Plugin {
 	plugin.RootCommand.Help(helpText)
 	return plugin
+}
+
+// Activate marks a plugin as ready.
+func (plugin *Plugin) Activate() {
+	// TODO: we should dispatch setUp(...)
+	plugin.IsReady = true
 }

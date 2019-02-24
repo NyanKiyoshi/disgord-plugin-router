@@ -24,7 +24,7 @@ func createDummyContext(session *mocked_disgord.MockclientSession) *drouter.Cont
 	}
 }
 
-func TestContext_Reply(t *testing.T) {
+func TestContext_Say(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -37,5 +37,21 @@ func TestContext_Reply(t *testing.T) {
 		Return(nil, nil)
 
 	ctx := createDummyContext(mockedSession)
-	assert.Nil(t, ctx.Reply("Hello world"))
+	assert.Nil(t, ctx.Say("Hello world"))
+}
+
+func TestContext_SayComplex(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	var messageToSend = &disgord.Message{}
+
+	mockedSession := mocked_disgord.NewMockclientSession(mockCtrl)
+	mockedSession.
+		EXPECT().
+		SendMsg(channelID, messageToSend).
+		Return(nil, nil)
+
+	ctx := createDummyContext(mockedSession)
+	assert.Nil(t, ctx.SayComplex(messageToSend))
 }

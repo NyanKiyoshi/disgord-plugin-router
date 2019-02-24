@@ -15,7 +15,7 @@ type shouldEnablePluginFunc func(plugin *Plugin) bool
 // RouterDefinition defines the structure of a bot plugins routing.
 type RouterDefinition struct {
 	// Plugins Contains every registered plugin.
-	Plugins []Plugin
+	Plugins []*Plugin
 
 	// ShouldEnablePluginFuncs Contains a list of matcher to test
 	// against package paths. If it returns false, the plugin must disabled.
@@ -25,7 +25,7 @@ type RouterDefinition struct {
 // Router is the global plugin routing object.
 // It should be used by plugins to register themselves
 // during their initialization or else.
-var Router *RouterDefinition // noqa
+var Router = &RouterDefinition{}
 
 // Plugin creates a new module from a given type that will generate
 // the proper Plugin.ImportName value. And takes a human readable plugin name.
@@ -46,6 +46,7 @@ func (router *RouterDefinition) Plugin(pluginType interface{}, names ...string) 
 		Listeners: map[string][]interface{}{},
 	}
 
+	router.Plugins = append(router.Plugins, newPlugin)
 	return newPlugin
 }
 
@@ -84,15 +85,13 @@ func (router *RouterDefinition) Configure(client routerClient) {
 
 	// Add plugins events
 	for _, plugin := range router.Plugins {
-		pluginPtr := &plugin
-
 		// Skip disabled modules
-		if !router.isPluginEnabled(pluginPtr) {
+		if !router.isPluginEnabled(plugin) {
 			continue
 		}
 
 		// Setup the plugin
-		configurePlugin(pluginPtr, client)
+		configurePlugin(plugin, client)
 	}
 }
 
@@ -115,5 +114,5 @@ func configurePlugin(plugin *Plugin, client routerClient) {
 	}
 
 	// Set the module as ready and enabled
-	plugin.IsReady = true
+	plugin.Activate()
 }
