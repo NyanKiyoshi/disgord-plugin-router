@@ -65,6 +65,13 @@ func (router *RouterDefinition) Find(args ...string) (string, *Command) {
 	return "", nil
 }
 
+// DispatchMessage dispatches a command from a context
+// to the command wrappers and then, if it was succeeded,
+// it invokes the command itself.
+//
+// Otherwise or if any error from the command, it sends the error
+// to the user as reply. Or if the bot is not able to
+// (e.g.: don't have the 'Send Message' permission), it logs the error.
 func DispatchMessage(ctx *Context, success chan bool) {
 	var err error
 
@@ -104,6 +111,10 @@ func DispatchMessage(ctx *Context, success chan bool) {
 	success <- false
 }
 
+// ParseMessage parses a message into a list of arguments.
+//
+// TODO: in a future release it will parse using typing
+//  	 and allow quoted arguments.
 func ParseMessage(message string) []string {
 	return strings.Fields(message)
 }
