@@ -4,11 +4,21 @@ import "github.com/andersfylling/disgord"
 
 // Context defines callbacks invocation context.
 type Context struct {
-	// Message Contains the received message
+	// Message contains the received message
 	Message *disgord.Message
 
-	// Session Contains the received discord session
+	// Session contains the received discord session
 	Session clientSession
+
+	// Command is the matched command
+	Command *Command
+
+	// MatchedPrefix is the command (plugin's) prefix
+	MatchedPrefix string
+
+	// Args contains the received arguments
+	// Deprecated: it will totally change in a future release
+	Args []string
 }
 
 // Say replies to a message with a given string.

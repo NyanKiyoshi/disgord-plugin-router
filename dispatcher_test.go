@@ -27,11 +27,18 @@ var routerDefinitionFindTests = []struct {
 }
 
 func TestRouterDefinition_Find(t *testing.T) {
+	var (
+		foundCommand *drouter.Command
+		prefix       string
+	)
+
 	router := createTestRouter()
 	plugin := router.Plugin(_myModuleInternalType{}, "color", "colour").SetPrefix("?")
 
 	// Should return nil as the plugin is not yet enabled
-	assert.Nil(t, router.Find("color"), "plugin should not be enabled")
+	prefix, foundCommand = router.Find("color")
+	assert.Nil(t, foundCommand, "plugin should not be enabled")
+	assert.Empty(t, prefix, "prefix of a non found command should be empty")
 
 	// Add dummy commands
 	plugin.Command("red")
@@ -41,16 +48,18 @@ func TestRouterDefinition_Find(t *testing.T) {
 	plugin.Activate()
 
 	for _, tt := range routerDefinitionFindTests {
-		var foundCommand *drouter.Command
 		t.Run(fmt.Sprintf("%s: %s", tt.name, tt.in), func(t *testing.T) {
-			foundCommand = router.Find(tt.in...)
+			prefix, foundCommand = router.Find(tt.in...)
 
 			if tt.shouldReturnRootCommand {
 				assert.Equal(t, &plugin.RootCommand, foundCommand, "expected root command")
+				assert.Equal(t, "?", prefix)
 			} else if tt.shouldReturnSubCommand {
 				assert.Equal(t, subCommand, foundCommand, "expected sub command")
+				assert.Equal(t, "?", prefix)
 			} else {
 				assert.Nil(t, foundCommand, "expected nil, command should'nt because found")
+				assert.Empty(t, prefix, "prefix of a non found command should be empty")
 			}
 		})
 	}

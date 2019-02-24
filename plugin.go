@@ -1,5 +1,6 @@
 package drouter
 
+// DefaultPrefix defines the default command prefix of plugins.
 var DefaultPrefix = "/"
 
 // Plugin defines the structure of a disgord plugin.
