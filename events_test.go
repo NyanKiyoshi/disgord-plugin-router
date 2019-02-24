@@ -1,3 +1,5 @@
+//+build ignore
+
 package drouter_test
 
 import (
