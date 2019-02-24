@@ -1,5 +1,6 @@
-package discplugins
+package drouter
 
+// DefaultPrefix defines the default command prefix of plugins.
 var DefaultPrefix = "/"
 
 // Plugin defines the structure of a disgord plugin.
@@ -17,13 +18,18 @@ type Plugin struct {
 	// of the plugin (see https://godoc.org/github.com/andersfylling/disgord/event).
 	Listeners map[string][]interface{}
 
-	// Wrappers contains the registered sub-commands of the plugin.
+	// Wrappers Contains the registered sub-commands of the plugin.
 	Commands []*Command
+
+	// IsReady is true is the module was loaded and installed into the client.
+	IsReady bool
 }
 
 // Use appends given callbacks to a plugin to call
 // whenever a command is being invoked.
 func (plugin *Plugin) Use(callbackFuncs ...callbackFunc) *Plugin {
+	// FIXME: we should put them as global wrappers in Plugin
+	//        instead of the root command.
 	plugin.RootCommand.Use(callbackFuncs...)
 	return plugin
 }
@@ -57,7 +63,7 @@ func (plugin *Plugin) On(eventName string, inputs ...interface{}) *Plugin {
 // Command creates a new sub-command for the plugin.
 func (plugin *Plugin) Command(names ...string) *Command {
 	newCommand := &Command{
-		Names: names,
+		Names: NewStringSet(names...),
 	}
 	plugin.Commands = append(plugin.Commands, newCommand)
 	return newCommand
@@ -69,4 +75,10 @@ func (plugin *Plugin) Command(names ...string) *Command {
 func (plugin *Plugin) Help(helpText string) *Plugin {
 	plugin.RootCommand.Help(helpText)
 	return plugin
+}
+
+// Activate marks a plugin as ready.
+func (plugin *Plugin) Activate() {
+	// TODO: we should dispatch setUp(...)
+	plugin.IsReady = true
 }

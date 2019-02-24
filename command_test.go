@@ -1,4 +1,4 @@
-package discplugins_test
+package drouter_test
 
 import (
 	"github.com/NyanKiyoshi/disgord-plugin-router"
@@ -6,10 +6,15 @@ import (
 	"testing"
 )
 
-func createDummyCommand() *discplugins.Command {
-	return &discplugins.Command{
-		Names: []string{"test"},
+func createDummyCommand(names ...string) *drouter.Command {
+	if len(names) < 1 {
+		names = []string{"test"}
 	}
+
+	cmd := &drouter.Command{
+		Names: drouter.NewStringSet(names...),
+	}
+	return cmd
 }
 
 func TestCommand_Match(t *testing.T) {
@@ -51,7 +56,7 @@ func TestCommand_MatchRE(t *testing.T) {
 func TestCommand_Handler(t *testing.T) {
 	// Create a testing command and a dummy handler
 	cmd := createDummyCommand()
-	handler := func(ctx *discplugins.Context) error {
+	handler := func(ctx *drouter.Context) error {
 		return successError
 	}
 
@@ -71,7 +76,7 @@ func TestCommand_Use(t *testing.T) {
 	cmd := createDummyCommand()
 
 	// Create the dummy callback
-	callback := func(ctx *discplugins.Context) error {
+	callback := func(ctx *drouter.Context) error {
 		return successError
 	}
 
@@ -112,6 +117,62 @@ func TestCommand_Help(t *testing.T) {
 			// Check the results
 			assert.Equal(t, tt.expectedShortText, cmd.ShortHelp)
 			assert.Equal(t, tt.in, cmd.LongHelp)
+		})
+	}
+}
+
+// isMatchingTests table driven tests against the 'ping' command
+var isMatchingTests = []struct {
+	testName     string
+	commandNames []string
+	matchFunc    func(input string) bool
+	shouldFind   bool
+}{
+	{
+		testName:     "valid existing command",
+		commandNames: []string{"ping"},
+		matchFunc:    nil,
+		shouldFind:   true,
+	},
+	{
+		testName:     "inexisting command",
+		commandNames: []string{"pong"},
+		matchFunc:    nil,
+		shouldFind:   false,
+	},
+	{
+		testName:     "inexisting command, but matching func",
+		commandNames: []string{"pong"},
+		matchFunc: func(input string) bool {
+			return true
+		},
+		shouldFind: true,
+	},
+	{
+		testName:     "no commands set, but matching func",
+		commandNames: []string{},
+		matchFunc: func(input string) bool {
+			return true
+		},
+		shouldFind: true,
+	},
+	{
+		testName:     "nothing set",
+		commandNames: []string{},
+		matchFunc:    nil,
+		shouldFind:   false,
+	},
+}
+
+func TestCommand_IsMatching(t *testing.T) {
+	for _, tt := range isMatchingTests {
+		t.Run(tt.testName, func(t *testing.T) {
+			// Setup the test command
+			cmd := createDummyCommand(tt.commandNames...)
+			cmd.MatchFunc = tt.matchFunc
+
+			// Attempt matching again 'ping'
+			assert.Equal(t, tt.shouldFind, cmd.IsMatching("ping"))
 		})
 	}
 }

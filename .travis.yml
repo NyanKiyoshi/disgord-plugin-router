@@ -21,10 +21,10 @@ install:
 script:
   - "go test -race \
         -covermode=atomic \
-        -coverpkg=./... \
+        -coverpkg=./ \
         -coverprofile=coverage.txt \
         -tags test \
-        ./..."
+        ./"
 
 after_success:
   - "python -m codecov"

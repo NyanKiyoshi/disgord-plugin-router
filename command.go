@@ -1,4 +1,4 @@
-package discplugins
+package drouter
 
 import (
 	"regexp"
@@ -10,24 +10,24 @@ type matcherFunc func(input string) bool
 // Command defines the structure of a plugin sub-command.
 type Command struct {
 	// Names lists the different aliases of the sub-command.
-	Names []string
+	Names StringSet
 
 	// MatchFunc is called whenever a new message
 	// (starting with the correct prefix) is received by the plugin
 	// and return true or false if it should be handled by this command or not.
 	MatchFunc matcherFunc
 
-	// HandlerFunc contains the function to invoke
+	// HandlerFunc Contains the function to invoke
 	// whenever the command is requested.
 	HandlerFunc callbackFunc
 
-	// Wrappers contains the functions to invoke before the command.
+	// Wrappers Contains the functions to invoke before the command.
 	Wrappers []callbackFunc
 
-	// ShortHelp contains the short straightforward command help.
+	// ShortHelp Contains the short straightforward command help.
 	ShortHelp string
 
-	// LongHelp contains the long descriptive command documentation.
+	// LongHelp Contains the long descriptive command documentation.
 	LongHelp string
 }
 
@@ -74,4 +74,10 @@ func (cmd *Command) Help(helpText string) *Command {
 	cmd.LongHelp = helpText
 
 	return cmd
+}
+
+// IsMatching returns true if the command name exists or
+// if it matches the matching function, if provided.
+func (cmd *Command) IsMatching(targetCommand string) bool {
+	return cmd.Names.Contains(targetCommand) || (cmd.MatchFunc != nil && cmd.MatchFunc(targetCommand))
 }

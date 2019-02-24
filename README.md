@@ -25,6 +25,10 @@
 A plugin management and routing mechanism for
 [Disgord](https://github.com/andersfylling/disgord).
 
+**WARNING: this repository is still in active development and is not yet ready 
+for the proper expected user experience. See the [roadmap](#roadmap) for more details.**
+
+
 ## Design Approach
 The approach of this library is that the bot developer will create a plugin 
 for each command, each plugin can have a set of sub-commands.
@@ -49,12 +53,15 @@ for each command, each plugin can have a set of sub-commands.
   ([read](#) or [example](#))
 - Can define [Disgord events](https://godoc.org/github.com/andersfylling/disgord/event) 
   handlers per plugin ([read](#) or [example](#))
+- Can define typed arguments with auto parsing and error management ([read](#) or [example](#))
 - Can blacklist/ disable pluging using patterns or matchers ([read](#) or [example](#))
 - Can define plugin `setUp` and `tearDown` handlers ([read](#) or [example](#))
 - Command handlers/ callbacks are context based ([read](#) or [example](#))
 - Plugins can have separate or the same command prefix everywhere ([read](#) or [example](#))
+- Errors can be returned by handlers and directly reported to the user ([read](#) or [example](#))
 - Modular, modules can be imported from anywhere using go modules ([read](#) or [example](#))
-- ...It's open source, fully tested and make with love! 🚀
+- ...It's open source, fully tested and made with love! 🚀
+
 
 ## Usage
 ```go
@@ -70,25 +77,33 @@ type _internal struct {}
 func main() {
 	client := disgord.New(&disgord.Config{BotToken: "YOUR BOT TOKEN"})
 	
-	router := discplugins.New()
-	pingPlugin := router.Plugin(_internal{}, "ping").Handler(func(ctx *discplugins.Context) error {
-		return ctx.Reply("pong!")
-	})
-	pingPlugin.Command("miss").Handler(func(ctx *discplugins.Context) error {
-		return ctx.Reply("I missed.")
-	})
+	drouter.Router.Plugin(_internal{}, "ping").
+		Handler(func(ctx *drouter.Context) error {
+			return ctx.Say("pong!")
+		}).
+		Command("miss").Handler(func(ctx *drouter.Context) error {
+			return ctx.Say("I missed.")
+		})
 	
 	// Setup the client from the router
-	router.Load(client)
+	drouter.Router.Configure(client)
 
-	// connect to the discord gateway to receive events
+	// Connect to the discord gateway to receive events
 	if err := client.Connect(); err != nil {
 		panic(err)
 	}
 
-	// connect to the discord gateway to receive events
+	// Wait for ever for interrupt. Then, disconnect.
 	if err := client.DisconnectOnInterrupt(); err != nil {
 		panic(err)
 	}
 }
 ```
+
+
+## Roadmap
+- [ ] Implement arguments parsing with dynamic typing (instead of strings).
+- [ ] Context arguments should not contain the dispatched root command or sub command.
+- [ ] Drop plugins pointer array in the router.
+- [ ] Implement `SetUp(...)` and `TearDown(...)` functions on the plugins.
+- [ ] Add final documentation and complete examples for each feature.
