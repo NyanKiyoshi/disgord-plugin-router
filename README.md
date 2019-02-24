@@ -25,6 +25,10 @@
 A plugin management and routing mechanism for
 [Disgord](https://github.com/andersfylling/disgord).
 
+**WARNING: this repository is still in active development and is not yet ready 
+for the proper expected user experience. See the [roadmap](#roadmap) for more details.**
+
+
 ## Design Approach
 The approach of this library is that the bot developer will create a plugin 
 for each command, each plugin can have a set of sub-commands.
@@ -58,6 +62,7 @@ for each command, each plugin can have a set of sub-commands.
 - Modular, modules can be imported from anywhere using go modules ([read](#) or [example](#))
 - ...It's open source, fully tested and made with love! 🚀
 
+
 ## Usage
 ```go
 package main
@@ -74,10 +79,10 @@ func main() {
 	
 	drouter.Router.Plugin(_internal{}, "ping").
 		Handler(func(ctx *drouter.Context) error {
-			return ctx.Reply("pong!")
+			return ctx.Say("pong!")
 		}).
 		Command("miss").Handler(func(ctx *drouter.Context) error {
-			return ctx.Reply("I missed.")
+			return ctx.Say("I missed.")
 		})
 	
 	// Setup the client from the router
@@ -94,3 +99,11 @@ func main() {
 	}
 }
 ```
+
+
+## Roadmap
+- [ ] Implement arguments parsing with dynamic typing (instead of strings).
+- [ ] Context arguments should not contain the dispatched root command or sub command.
+- [ ] Drop plugins pointer array in the router.
+- [ ] Implement `SetUp(...)` and `TearDown(...)` functions on the plugins.
+- [ ] Add final documentation and complete examples for each feature.
