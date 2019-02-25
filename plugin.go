@@ -12,14 +12,14 @@ type Plugin struct {
 	Prefix string
 
 	// RootCommand defines the base plugin's root/ base command
-	RootCommand Command
+	RootCommand command
 
 	// Listeners defines the different event handlers
 	// of the plugin (see https://godoc.org/github.com/andersfylling/disgord/event).
 	Listeners map[string][]interface{}
 
 	// Wrappers Contains the registered sub-commands of the plugin.
-	Commands []*Command
+	Commands []*command
 
 	// IsLoaded is true is the module was loaded and installed into the client.
 	IsLoaded bool
@@ -28,7 +28,7 @@ type Plugin struct {
 // Use appends given callbacks to a plugin to call
 // whenever a command is being invoked.
 func (plugin *Plugin) Use(callbackFuncs ...callbackFunc) *Plugin {
-	// FIXME: we should put them as global wrappers in Plugin
+	// FIXME: we should put them as global wrappers in plugin
 	//        instead of the root command.
 	plugin.RootCommand.Use(callbackFuncs...)
 	return plugin
@@ -60,11 +60,11 @@ func (plugin *Plugin) On(eventName string, inputs ...interface{}) *Plugin {
 	return plugin
 }
 
-// Command creates a new sub-command for the plugin.
-func (plugin *Plugin) Command(names ...string) *Command {
-	command := newCommand(names...)
-	plugin.Commands = append(plugin.Commands, &command)
-	return &command
+// command creates a new sub-command for the plugin.
+func (plugin *Plugin) Command(names ...string) *command {
+	createdCommand := newCommand(names...)
+	plugin.Commands = append(plugin.Commands, &createdCommand)
+	return &createdCommand
 }
 
 // Help sets the help text of a command. The first line is

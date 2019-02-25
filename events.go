@@ -6,23 +6,23 @@ import (
 
 type callbackFunc func(ctx *Context) error
 
-// OnMessageReceived is invoked whenever a new message is created,
+// onMessageReceived is invoked whenever a new message is created,
 // it will dispatch instructions if the message is a command,
 // and if the message is not from the bot itself.
-func (router *RouterDefinition) OnMessageReceived(session disgord.Session, event *disgord.MessageCreate) {
+func (router *RouterDefinition) onMessageReceived(session disgord.Session, event *disgord.MessageCreate) {
 	myself, err := session.Myself()
 	if err != nil || event.Message.Author.ID == myself.ID {
 		return
 	}
 
-	args := ParseMessage(event.Message.Content)
+	args := parseMessage(event.Message.Content)
 	matchedPrefix, foundCommand := router.Find(args...)
 
 	if foundCommand == nil {
 		return
 	}
 
-	go DispatchMessage(&Context{
+	go dispatchMessage(&Context{
 		Session:       session,
 		Message:       event.Message,
 		Command:       foundCommand,

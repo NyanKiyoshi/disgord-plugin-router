@@ -1,21 +1,16 @@
-package drouter_test
+package drouter
 
 import (
-	"github.com/NyanKiyoshi/disgord-plugin-router"
-	"github.com/NyanKiyoshi/disgord-plugin-router/internal/stringset"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func createDummyCommand(names ...string) *drouter.Command {
+func createDummyCommand(names ...string) command {
 	if len(names) < 1 {
 		names = []string{"test"}
 	}
 
-	cmd := &drouter.Command{
-		Names: stringset.NewStringSet(names...),
-	}
-	return cmd
+	return newCommand(names...)
 }
 
 func TestCommand_Match(t *testing.T) {
@@ -57,7 +52,7 @@ func TestCommand_MatchRE(t *testing.T) {
 func TestCommand_Handler(t *testing.T) {
 	// Create a testing command and a dummy handler
 	cmd := createDummyCommand()
-	handler := func(ctx *drouter.Context) error {
+	handler := func(ctx *Context) error {
 		return successError
 	}
 
@@ -77,7 +72,7 @@ func TestCommand_Use(t *testing.T) {
 	cmd := createDummyCommand()
 
 	// Create the dummy callback
-	callback := func(ctx *drouter.Context) error {
+	callback := func(ctx *Context) error {
 		return successError
 	}
 

@@ -2,6 +2,7 @@ package drouter_test
 
 import (
 	"github.com/NyanKiyoshi/disgord-plugin-router"
+	"github.com/NyanKiyoshi/disgord-plugin-router/internal/mockdisgord"
 	"github.com/NyanKiyoshi/disgord-plugin-router/mocks/mocked_disgord"
 	"github.com/andersfylling/disgord"
 	"github.com/golang/mock/gomock"
@@ -9,22 +10,9 @@ import (
 	"testing"
 )
 
-var channelID = disgord.NewSnowflake(123)
-var selfUserID = disgord.NewSnowflake(456)
-
-func createDummyMessage() *disgord.Message {
-	return &disgord.Message{
-		ChannelID: channelID,
-		Author: &disgord.User{
-			ID: selfUserID,
-		},
-		Content: "hello",
-	}
-}
-
 func createDummyContext(session *mocked_disgord.MockrouterSession) *drouter.Context {
 	return &drouter.Context{
-		Message: createDummyMessage(),
+		Message: mockdisgord.CreateDummyMessage(),
 		Session: session,
 	}
 }
@@ -38,7 +26,7 @@ func TestContext_Say(t *testing.T) {
 	mockedSession := mocked_disgord.NewMockrouterSession(mockCtrl)
 	mockedSession.
 		EXPECT().
-		SendMsgString(channelID, messageToSend).
+		SendMsgString(mockdisgord.ChannelID, messageToSend).
 		Return(nil, nil)
 
 	ctx := createDummyContext(mockedSession)
@@ -54,7 +42,7 @@ func TestContext_SayComplex(t *testing.T) {
 	mockedSession := mocked_disgord.NewMockrouterSession(mockCtrl)
 	mockedSession.
 		EXPECT().
-		SendMsg(channelID, messageToSend).
+		SendMsg(mockdisgord.ChannelID, messageToSend).
 		Return(nil, nil)
 
 	ctx := createDummyContext(mockedSession)

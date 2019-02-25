@@ -1,6 +1,6 @@
 //+build ignore
 
-package drouter_test
+package drouter
 
 import (
 	"github.com/NyanKiyoshi/disgord-plugin-router"
@@ -33,12 +33,12 @@ func mockMySelf(
 // - That it's ignoring messages that are the bot itself (returning nil).
 // - And that it returns nil when the command is not found.
 func TestRouterDefinition_OnMessageReceived_HandlesErrors(t *testing.T) {
-	router := createTestRouter()
+	router := drouter.RouterDefinition{}
 
 	t.Run("ignores self messages", func(t *testing.T) {
 		mockMySelf(t, selfUserID, func(t *testing.T, session *mocked_disgord.MockrouterSession) {
 			// It should return nil
-			assert.Nil(t, router.OnMessageReceived(session, &disgord.MessageCreate{
+			assert.Nil(t, router.onMessageReceived(session, &disgord.MessageCreate{
 				Message: createDummyMessage(),
 			}))
 		})
@@ -47,7 +47,7 @@ func TestRouterDefinition_OnMessageReceived_HandlesErrors(t *testing.T) {
 	t.Run("returns nil when invalid command", func(t *testing.T) {
 		mockMySelf(t, disgord.Snowflake(555), func(t *testing.T, session *mocked_disgord.MockrouterSession) {
 			// It should return nil
-			assert.Nil(t, router.OnMessageReceived(session, &disgord.MessageCreate{
+			assert.Nil(t, router.onMessageReceived(session, &disgord.MessageCreate{
 				Message: createDummyMessage(),
 			}))
 		})
@@ -72,7 +72,7 @@ func TestRouterDefinition_OnMessageReceived_HandlesErrors(t *testing.T) {
 
 		mockMySelf(t, disgord.Snowflake(555), func(t *testing.T, session *mocked_disgord.MockrouterSession) {
 			// Dispatch the event
-			successChannel := router.OnMessageReceived(session, &disgord.MessageCreate{
+			successChannel := router.onMessageReceived(session, &disgord.MessageCreate{
 				Message: message,
 			})
 

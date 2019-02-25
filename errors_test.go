@@ -1,4 +1,4 @@
-package drouter_test
+package drouter
 
 import "errors"
 

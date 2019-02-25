@@ -6,6 +6,7 @@ import (
 	"github.com/NyanKiyoshi/disgord-plugin-router/mocks/mocked_disgord"
 	"github.com/andersfylling/disgord"
 	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -16,11 +17,7 @@ func createTestRouter() *drouter.RouterDefinition {
 	return &drouter.RouterDefinition{}
 }
 
-func createTestPlugin() *drouter.Plugin {
-	return createTestRouter().Plugin(_myModuleInternalType{}, "my-module")
-}
-
-func ExampleNew_newPlugin() {
+func Example_newPlugin() {
 	myPlugin := drouter.Router.Plugin(_myModuleInternalType{}, "my-plugin")
 	fmt.Printf("ImportName: %s\nNames: %s", myPlugin.ImportName, myPlugin.RootCommand.Names.Keys())
 	// Output:
@@ -112,7 +109,7 @@ func TestRouterDefinition_Configure_OnlyInstallInternalEvents(t *testing.T) {
 		if customErr != nil {
 			assert.Equal(
 				subT,
-				"failed to register router's internal MessageCreate event: success",
+				"failed to register router's internal MessageCreate event: successful test",
 				receivedLog,
 			)
 		}
@@ -123,7 +120,7 @@ func TestRouterDefinition_Configure_OnlyInstallInternalEvents(t *testing.T) {
 	})
 
 	t.Run("with errored configuration", func(t *testing.T) {
-		runTest(t, successError)
+		runTest(t, errors.New("successful test"))
 	})
 }
 
@@ -171,7 +168,7 @@ func TestRouterDefinition_Configure_WithRegisteredPlugins(t *testing.T) {
 			assert.Equal(
 				subT,
 				"failed to register event MESSAGE_CREATE "+
-					"for plugin github.com/NyanKiyoshi/disgord-plugin-router_test: success",
+					"for plugin github.com/NyanKiyoshi/disgord-plugin-router_test: successful test",
 				receivedLog,
 			)
 		}
@@ -182,6 +179,6 @@ func TestRouterDefinition_Configure_WithRegisteredPlugins(t *testing.T) {
 	})
 
 	t.Run("with invalid event error", func(t *testing.T) {
-		runTest(t, successError)
+		runTest(t, errors.New("successful test"))
 	})
 }

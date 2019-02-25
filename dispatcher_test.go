@@ -1,9 +1,9 @@
-package drouter_test
+package drouter
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/NyanKiyoshi/disgord-plugin-router"
+	"github.com/NyanKiyoshi/disgord-plugin-router/internal/mockdisgord"
 	"github.com/NyanKiyoshi/disgord-plugin-router/mocks/mocked_disgord"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -33,12 +33,12 @@ var routerDefinitionFindTests = []struct {
 
 func TestRouterDefinition_Find(t *testing.T) {
 	var (
-		foundCommand *drouter.Command
+		foundCommand *command
 		prefix       string
 	)
 
-	router := createTestRouter()
-	plugin := router.Plugin(_myModuleInternalType{}, "color", "colour").SetPrefix("?")
+	router := RouterDefinition{}
+	plugin := router.Plugin(struct{}{}, "color", "colour").SetPrefix("?")
 
 	// Should return nil as the plugin is not yet enabled
 	prefix, foundCommand = router.Find("color")
@@ -80,21 +80,21 @@ func TestDispatchMessage_EverythingValid(t *testing.T) {
 	command := createDummyCommand()
 
 	// Add a non-errored wrapper that we will check if it gets called
-	command.Use(func(ctx *drouter.Context) error {
+	command.Use(func(ctx *Context) error {
 		WrapperCalled = true
 		return nil
 	})
 
 	// Add a non-errored command handler that we will check if it gets called
-	command.Handler(func(ctx *drouter.Context) error {
+	command.Handler(func(ctx *Context) error {
 		CommandHandlerCalled = true
 		return nil
 	})
 
 	// Execute the dispatcher, it is expected to succeed
 	isSuccessChan := make(chan bool, 1)
-	drouter.DispatchMessage(&drouter.Context{
-		Command: command,
+	dispatchMessage(&Context{
+		Command: &command,
 	}, isSuccessChan)
 
 	// Check if it was successful, as we expect
@@ -116,9 +116,12 @@ func TestDispatchMessage_HandlesFuncErrors(t *testing.T) {
 		mockedSession := mocked_disgord.NewMockrouterSession(mockCtrl)
 
 		// Create the test context
-		ctx := createDummyContext(mockedSession)
-		ctx.Command = command
-		ctx.MatchedPrefix = "!"
+		ctx := &Context{
+			Message:       mockdisgord.CreateDummyMessage(),
+			Session:       mockedSession,
+			Command:       &command,
+			MatchedPrefix: "!",
+		}
 
 		// Create the result channel
 		isSuccessChan := make(chan bool, 1)
@@ -126,11 +129,11 @@ func TestDispatchMessage_HandlesFuncErrors(t *testing.T) {
 		// Prepare the mock
 		mockedSession.
 			EXPECT().
-			SendMsgString(channelID, successError.Error()).
+			SendMsgString(mockdisgord.ChannelID, successError.Error()).
 			Return(ctx.Message, discordAPIError)
 
 		// Execute the dispatcher, it is expected to succeed
-		drouter.DispatchMessage(ctx, isSuccessChan)
+		dispatchMessage(ctx, isSuccessChan)
 
 		// Check if it was successful, as we expect
 		assert.False(checkT, <-isSuccessChan)
@@ -141,7 +144,7 @@ func TestDispatchMessage_HandlesFuncErrors(t *testing.T) {
 		oldWrappers := command.Wrappers
 
 		// Add a wrapper that will return an error
-		command.Use(func(ctx *drouter.Context) error {
+		command.Use(func(ctx *Context) error {
 			return successError
 		})
 
@@ -152,7 +155,7 @@ func TestDispatchMessage_HandlesFuncErrors(t *testing.T) {
 	// Test command's handler errors are handled
 	t.Run("against command handler", func(t *testing.T) {
 		// Add a wrapper that will return an error
-		command.Handler(func(ctx *drouter.Context) error {
+		command.Handler(func(ctx *Context) error {
 			return successError
 		})
 
@@ -190,7 +193,7 @@ var parseMessageTests = []struct {
 func TestParseMessage(t *testing.T) {
 	for _, tt := range parseMessageTests {
 		t.Run(tt.in, func(t *testing.T) {
-			assert.EqualValues(t, tt.out, drouter.ParseMessage(tt.in))
+			assert.EqualValues(t, tt.out, parseMessage(tt.in))
 		})
 	}
 }

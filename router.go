@@ -95,7 +95,7 @@ func (router *RouterDefinition) Configure(client routerClient) {
 // installInternalEvents installs the router internal events
 // into a given client.
 func (router *RouterDefinition) installInternalEvents(client routerClient) {
-	if err := client.On(event.MessageCreate, router.OnMessageReceived); err != nil {
+	if err := client.On(event.MessageCreate, router.onMessageReceived); err != nil {
 		LogFatalf("failed to register router's internal MessageCreate event: %s", err)
 	}
 }

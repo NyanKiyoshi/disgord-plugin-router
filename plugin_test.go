@@ -1,18 +1,25 @@
 package drouter_test
 
 import (
+	"errors"
 	"github.com/NyanKiyoshi/disgord-plugin-router"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+func createTestPlugin() *drouter.Plugin {
+	router := drouter.RouterDefinition{}
+	return router.Plugin(struct{}{}, "my-module")
+}
+
 func TestPlugin_Use(t *testing.T) {
-	// Create a testing plugin
+	// Create a testing plugin and a dummy error
 	plugin := createTestPlugin()
+	dummyError := errors.New("test")
 
 	// Create the dummy callback
 	callback := func(ctx *drouter.Context) error {
-		return successError
+		return dummyError
 	}
 
 	// Ensure there are not wrappers on an empty plugin
@@ -23,7 +30,7 @@ func TestPlugin_Use(t *testing.T) {
 
 	// Ensure it was added
 	assert.Len(t, plugin.RootCommand.Wrappers, 1)
-	assert.Equal(t, successError, plugin.RootCommand.Wrappers[0](nil))
+	assert.Equal(t, dummyError, plugin.RootCommand.Wrappers[0](nil))
 }
 
 func TestPlugin_SetPrefix(t *testing.T) {
@@ -41,10 +48,11 @@ func TestPlugin_SetPrefix(t *testing.T) {
 }
 
 func TestPlugin_Handler(t *testing.T) {
-	// Create a testing plugin and a dummy handler
+	// Create a testing plugin, a dummy error and an handler
 	plugin := createTestPlugin()
+	dummyError := errors.New("test")
 	handler := func(ctx *drouter.Context) error {
-		return successError
+		return dummyError
 	}
 
 	// Ensure no handler is registered by default
@@ -55,7 +63,7 @@ func TestPlugin_Handler(t *testing.T) {
 
 	// Check it was correctly set
 	assert.NotNil(t, plugin.RootCommand.HandlerFunc)
-	assert.Equal(t, successError, plugin.RootCommand.HandlerFunc(nil))
+	assert.Equal(t, dummyError, plugin.RootCommand.HandlerFunc(nil))
 }
 
 func TestPlugin_On(t *testing.T) {
@@ -107,7 +115,8 @@ func TestPlugin_Command(t *testing.T) {
 	cmd := plugin.Command("color", "colour")
 
 	// Check if the command was correctly registered
-	assert.EqualValues(t, []*drouter.Command{cmd}, plugin.Commands)
+	assert.Len(t, plugin.Commands, 1)
+	assert.Equal(t, cmd, plugin.Commands[0])
 
 	// Check if the registered command is correct
 	assert.ElementsMatch(t, []string{"color", "colour"}, cmd.Names.Keys())

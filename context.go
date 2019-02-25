@@ -10,8 +10,8 @@ type Context struct {
 	// Session contains the received discord session
 	Session routerSession
 
-	// Command is the matched command
-	Command *Command
+	// command is the matched command
+	Command *command
 
 	// MatchedPrefix is the command (plugin's) prefix
 	MatchedPrefix string

@@ -8,8 +8,8 @@ import (
 
 type matcherFunc func(input string) bool
 
-// Command defines the structure of a plugin sub-command.
-type Command struct {
+// command defines the structure of a plugin sub-command.
+type command struct {
 	// Names lists the different aliases of the sub-command.
 	Names stringset.StringSet
 
@@ -33,20 +33,20 @@ type Command struct {
 }
 
 // newCommand creates and initialize a new command object.
-func newCommand(names ...string) Command {
-	return Command{
+func newCommand(names ...string) command {
+	return command{
 		Names: stringset.NewStringSet(names...),
 	}
 }
 
 // Match sets the matching function from a given function.
-func (cmd *Command) Match(matcherFunc matcherFunc) *Command {
+func (cmd *command) Match(matcherFunc matcherFunc) *command {
 	cmd.MatchFunc = matcherFunc
 	return cmd
 }
 
 // MatchRE defines a matching function from a given regex.
-func (cmd *Command) MatchRE(regex string) *Command {
+func (cmd *command) MatchRE(regex string) *command {
 	matcher := regexp.MustCompile(regex)
 
 	cmd.MatchFunc = func(input string) bool {
@@ -58,14 +58,14 @@ func (cmd *Command) MatchRE(regex string) *Command {
 
 // Handler defines the function to invoke whenever the command
 // is being invoked.
-func (cmd *Command) Handler(callbackFunc callbackFunc) *Command {
+func (cmd *command) Handler(callbackFunc callbackFunc) *command {
 	cmd.HandlerFunc = callbackFunc
 	return cmd
 }
 
 // Use appends given callbacks to a command to call
 // whenever a command is being invoked.
-func (cmd *Command) Use(callbackFuncs ...callbackFunc) *Command {
+func (cmd *command) Use(callbackFuncs ...callbackFunc) *command {
 	cmd.Wrappers = append(cmd.Wrappers, callbackFuncs...)
 	return cmd
 }
@@ -73,7 +73,7 @@ func (cmd *Command) Use(callbackFuncs ...callbackFunc) *Command {
 // Help sets the help text of a command. The first line is
 // the short and straightforward documentation. The whole text
 // is the long and descriptive documentation.
-func (cmd *Command) Help(helpText string) *Command {
+func (cmd *command) Help(helpText string) *command {
 	if startPos := strings.Index(helpText, "\n"); startPos > -1 {
 		cmd.ShortHelp = helpText[:startPos]
 	} else {
@@ -86,6 +86,6 @@ func (cmd *Command) Help(helpText string) *Command {
 
 // IsMatching returns true if the command name exists or
 // if it matches the matching function, if provided.
-func (cmd *Command) IsMatching(targetCommand string) bool {
+func (cmd *command) IsMatching(targetCommand string) bool {
 	return cmd.Names.Contains(targetCommand) || (cmd.MatchFunc != nil && cmd.MatchFunc(targetCommand))
 }
