@@ -29,7 +29,7 @@ func (router *RouterDefinition) Find(args ...string) (string, *Command) {
 
 	for _, plugin := range router.Plugins {
 		// Skip plugins that are not active
-		if !plugin.IsReady {
+		if !plugin.IsLoaded {
 			continue
 		}
 

@@ -140,7 +140,7 @@ func TestRouterDefinition_Configure_WithRegisteredPlugins(t *testing.T) {
 	disabledPlugin := router.Plugin(_myModuleInternalType{}).SetPrefix("disabled")
 
 	// Ensure it is false by default
-	assert.False(t, plugin.IsReady)
+	assert.False(t, plugin.IsLoaded)
 
 	runTest := func(subT *testing.T, customErr error) {
 		// Mock log.Fatal
@@ -163,8 +163,8 @@ func TestRouterDefinition_Configure_WithRegisteredPlugins(t *testing.T) {
 		router.Configure(mockedClient)
 
 		// Ensure the plugin was enabled and the disabled one was ignore
-		assert.True(t, plugin.IsReady)
-		assert.False(t, disabledPlugin.IsReady)
+		assert.True(t, plugin.IsLoaded)
+		assert.False(t, disabledPlugin.IsLoaded)
 
 		// Check if log.Fatal was called if an error was set
 		if customErr != nil {

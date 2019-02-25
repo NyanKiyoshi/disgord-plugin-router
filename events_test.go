@@ -57,11 +57,14 @@ func TestRouterDefinition_OnMessageReceived_HandlesErrors(t *testing.T) {
 		// Will contain whether the ping command was invoked or not
 		var pingHandlerWasCalled bool
 
-		// Create a !ping module
-		router.Plugin(_myModuleInternalType{}, "ping").Handler(func(ctx *drouter.Context) error {
+		// Create a !ping plugn
+		pingPlugin := router.Plugin(_myModuleInternalType{}, "ping").Handler(func(ctx *drouter.Context) error {
 			pingHandlerWasCalled = true
 			return nil
-		}).SetPrefix("!").Activate()
+		}).SetPrefix("!")
+
+		// Force the plugin to be flagged as loaded
+		pingPlugin.IsLoaded = true
 
 		// Create a valid command message
 		message := createDummyMessage()

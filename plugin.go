@@ -21,8 +21,8 @@ type Plugin struct {
 	// Wrappers Contains the registered sub-commands of the plugin.
 	Commands []*Command
 
-	// IsReady is true is the module was loaded and installed into the client.
-	IsReady bool
+	// IsLoaded is true is the module was loaded and installed into the client.
+	IsLoaded bool
 }
 
 // Use appends given callbacks to a plugin to call
@@ -75,8 +75,8 @@ func (plugin *Plugin) Help(helpText string) *Plugin {
 	return plugin
 }
 
-// Activate marks a plugin as ready.
-func (plugin *Plugin) Activate() {
+// activate marks a plugin as ready.
+func (plugin *Plugin) activate() {
 	// TODO: we should dispatch setUp(...)
-	plugin.IsReady = true
+	plugin.IsLoaded = true
 }

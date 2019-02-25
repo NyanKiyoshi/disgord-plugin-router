@@ -111,5 +111,5 @@ func configurePlugin(plugin *Plugin, client routerClient) {
 	}
 
 	// Set the module as ready and enabled
-	plugin.Activate()
+	plugin.activate()
 }

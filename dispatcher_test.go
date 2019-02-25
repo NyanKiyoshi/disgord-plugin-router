@@ -49,8 +49,8 @@ func TestRouterDefinition_Find(t *testing.T) {
 	plugin.Command("red")
 	subCommand := plugin.Command("blue")
 
-	// Enable the plugin
-	plugin.Activate()
+	// Manually force the plugin to be flagged as loaded
+	plugin.IsLoaded = true
 
 	for _, tt := range routerDefinitionFindTests {
 		t.Run(fmt.Sprintf("%s: %s", tt.name, tt.in), func(t *testing.T) {
