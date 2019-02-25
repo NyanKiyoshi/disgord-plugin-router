@@ -62,11 +62,9 @@ func (plugin *Plugin) On(eventName string, inputs ...interface{}) *Plugin {
 
 // Command creates a new sub-command for the plugin.
 func (plugin *Plugin) Command(names ...string) *Command {
-	newCommand := &Command{
-		Names: NewStringSet(names...),
-	}
-	plugin.Commands = append(plugin.Commands, newCommand)
-	return newCommand
+	command := newCommand(names...)
+	plugin.Commands = append(plugin.Commands, &command)
+	return &command
 }
 
 // Help sets the help text of a command. The first line is

@@ -1,6 +1,7 @@
 package drouter
 
 import (
+	"github.com/NyanKiyoshi/disgord-plugin-router/internal/stringset"
 	"regexp"
 	"strings"
 )
@@ -10,7 +11,7 @@ type matcherFunc func(input string) bool
 // Command defines the structure of a plugin sub-command.
 type Command struct {
 	// Names lists the different aliases of the sub-command.
-	Names StringSet
+	Names stringset.StringSet
 
 	// MatchFunc is called whenever a new message
 	// (starting with the correct prefix) is received by the plugin
@@ -29,6 +30,13 @@ type Command struct {
 
 	// LongHelp Contains the long descriptive command documentation.
 	LongHelp string
+}
+
+// newCommand creates and initialize a new command object.
+func newCommand(names ...string) Command {
+	return Command{
+		Names: stringset.NewStringSet(names...),
+	}
 }
 
 // Match sets the matching function from a given function.

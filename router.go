@@ -37,12 +37,10 @@ var Router = &RouterDefinition{}
 //     name         The plugin's human readable name, such as "bot-statistics".
 func (router *RouterDefinition) Plugin(pluginType interface{}, names ...string) *Plugin {
 	newPlugin := &Plugin{
-		ImportName: reflect.TypeOf(pluginType).PkgPath(),
-		RootCommand: Command{
-			Names: NewStringSet(names...),
-		},
-		Prefix:    DefaultPrefix,
-		Listeners: map[string][]interface{}{},
+		ImportName:  reflect.TypeOf(pluginType).PkgPath(),
+		RootCommand: newCommand(names...),
+		Prefix:      DefaultPrefix,
+		Listeners:   map[string][]interface{}{},
 	}
 
 	router.Plugins = append(router.Plugins, newPlugin)

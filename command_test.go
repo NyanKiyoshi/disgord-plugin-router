@@ -2,6 +2,7 @@ package drouter_test
 
 import (
 	"github.com/NyanKiyoshi/disgord-plugin-router"
+	"github.com/NyanKiyoshi/disgord-plugin-router/internal/stringset"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -12,7 +13,7 @@ func createDummyCommand(names ...string) *drouter.Command {
 	}
 
 	cmd := &drouter.Command{
-		Names: drouter.NewStringSet(names...),
+		Names: stringset.NewStringSet(names...),
 	}
 	return cmd
 }
