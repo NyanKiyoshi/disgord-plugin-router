@@ -1,4 +1,4 @@
-// stringset package was taken from docker's distribution repo, under Apache-2.0 license:
+// Package stringset was taken from docker's distribution repo, under Apache-2.0 license:
 // https://github.com/docker/distribution/blob/0d3efadf015/registry/auth/token/stringset.go
 // Thank you for your work! <3
 package stringset

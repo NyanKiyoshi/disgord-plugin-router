@@ -60,7 +60,7 @@ func (plugin *Plugin) On(eventName string, inputs ...interface{}) *Plugin {
 	return plugin
 }
 
-// command creates a new sub-command for the plugin.
+// Command creates a new sub-command for the plugin.
 func (plugin *Plugin) Command(names ...string) *command {
 	createdCommand := newCommand(names...)
 	plugin.Commands = append(plugin.Commands, &createdCommand)
